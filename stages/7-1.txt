@@ -1,0 +1,82 @@
+/// internal funcs
+function AddStep(tgtArr, f, n) {
+	tgtArr.push({ f: f, n: n });
+}
+
+function Exec(queue) {
+	for (let m = 0; m < queue.length; m++) {
+		let command = queue[m];
+		for (let i = 0; i < command.n; i++) {
+			command.f();
+		}
+	}
+}
+
+/// compound commands
+function ThrowAll() {
+	let items = GetWorkerInventoryItems();
+	for (let i = 0; i < items.length; i++) {
+		ThrowItem(0);
+	}
+}
+
+function WaitSync() {
+	while (!SyncWorkers()) { }
+}
+
+/// wrappers
+function F() { MoveForward(); }
+function R() { TurnRight(); }
+function L() { TurnLeft(); }
+function N() { DoNothing(); }
+function T() { ThrowItem(0); }
+function TA() { ThrowAll(); }
+function W() { WaitSync(); }
+
+/// defining queues
+let initToLB = [];
+AddStep(initToLB, F, 5);
+AddStep(initToLB, R, 1);
+AddStep(initToLB, F, 2); //left button
+AddStep(initToLB, R, 2); //looking right
+
+let LBToExchange = [];
+AddStep(LBToExchange, F, 8);
+AddStep(LBToExchange, R, 1);
+AddStep(LBToExchange, F, 2);
+AddStep(LBToExchange, L, 1);
+AddStep(LBToExchange, F, 1);
+AddStep(LBToExchange, R, 1); //below mixer, exchange point, looking down
+
+let Exchange = [];
+AddStep(Exchange, W, 1);
+AddStep(Exchange, TA, 1);
+AddStep(Exchange, W, 1);
+
+let loop = [];
+AddStep(loop, R, 1);
+AddStep(loop, F, 1);
+AddStep(loop, R, 1);
+AddStep(loop, F, 1);
+AddStep(loop, N, 5); //filling mixer
+AddStep(loop, F, 1);
+AddStep(loop, L, 1);
+AddStep(loop, F, 8);
+AddStep(loop, R, 2);
+AddStep(loop, F, 11);
+AddStep(loop, R, 1);
+AddStep(loop, F, 2);
+AddStep(loop, R, 1);
+AddStep(loop, F, 2);
+AddStep(loop, L, 1); //back to exchange point
+
+/// execute init
+Exec(initToLB);
+Exec(LBToExchange);
+Exec(Exchange);
+
+/// execute loop
+while (true) {
+	Exec(loop);
+	Exec(Exchange);
+}
