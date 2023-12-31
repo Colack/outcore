@@ -1,0 +1,85 @@
+/// internal funcs
+function AddStep(tgtArr, f, n) {
+	tgtArr.push({ f: f, n: n });
+}
+
+function Exec(queue) {
+	for (let m = 0; m < queue.length; m++) {
+		let command = queue[m];
+		for (let i = 0; i < command.n; i++) {
+			command.f();
+		}
+	}
+}
+
+/// compound commands
+function ThrowAll() {
+	let items = GetWorkerInventoryItems();
+	for (let i = 0; i < items.length; i++) {
+		ThrowItem(0);
+	}
+}
+
+function WaitSync() {
+	while (!SyncWorkers()) { }
+}
+
+/// wrappers/shortcuts
+function F() { MoveForward(); }
+function R() { TurnRight(); }
+function L() { TurnLeft(); }
+function N() { DoNothing(); }
+function T() { ThrowItem(0); }
+function TA() { ThrowAll(); }
+function W() { WaitSync(); }
+
+/// defining queues
+let init = [];
+AddStep(init, F, 2);
+
+let loop = [];
+AddStep(loop, F, 11);
+AddStep(loop, L, 1);
+AddStep(loop, F, 5);
+AddStep(loop, L, 1); //before collecting chips row
+AddStep(loop, W, 1);
+AddStep(loop, F, 4);
+AddStep(loop, L, 1);
+AddStep(loop, F, 1);
+AddStep(loop, R, 1);
+AddStep(loop, F, 3);
+AddStep(loop, R, 1);
+AddStep(loop, F, 1);
+AddStep(loop, R, 1);
+AddStep(loop, F, 2);
+AddStep(loop, L, 1);
+AddStep(loop, F, 1);
+AddStep(loop, L, 1);
+AddStep(loop, N, 4); //upper mixer
+AddStep(loop, F, 1);
+AddStep(loop, R, 1);
+AddStep(loop, F, 3);
+AddStep(loop, R, 1); //above red chip row
+AddStep(loop, F, 3);
+AddStep(loop, R, 2);
+AddStep(loop, N, 3);
+AddStep(loop, F, 2);
+AddStep(loop, R, 1);
+AddStep(loop, F, 2); //exchange corner
+AddStep(loop, W, 1);
+AddStep(loop, W, 1);
+AddStep(loop, TA, 1);
+AddStep(loop, W, 1);
+AddStep(loop, L, 1); //back to UL button
+AddStep(loop, F, 6);
+AddStep(loop, L, 1);
+AddStep(loop, F, 11);
+AddStep(loop, L, 1);
+
+/// execute one-off
+Exec(init);
+
+/// execute in loop
+while (true) {
+	Exec(loop);
+}
