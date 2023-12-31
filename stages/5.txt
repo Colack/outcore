@@ -1,0 +1,79 @@
+/// internal funcs
+function AddStep(tgtArr, f, n) {
+	tgtArr.push({ f: f, n: n });
+}
+
+function Exec(queue) {
+	for (let m = 0; m < queue.length; m++) {
+		let command = queue[m];
+		for (let i = 0; i < command.n; i++) {
+			command.f();
+		}
+	}
+}
+
+/// wrappers/shortcuts
+function F() { MoveForward(); }
+function R() { TurnRight(); }
+function L() { TurnLeft(); }
+function N() { DoNothing(); }
+
+/// defining queues
+let getInPos = [];
+AddStep(getInPos, F, 4);
+AddStep(getInPos, L, 1);
+AddStep(getInPos, F, 1);
+AddStep(getInPos, L, 2);
+
+let loop = [];
+AddStep(loop, F, 4);
+AddStep(loop, R, 1);
+AddStep(loop, F, 1);
+AddStep(loop, L, 1);
+AddStep(loop, F, 1);
+AddStep(loop, R, 1);
+AddStep(loop, F, 9);
+AddStep(loop, L, 1);
+AddStep(loop, F, 2);
+AddStep(loop, L, 2);
+AddStep(loop, F, 7);
+AddStep(loop, R, 1);
+AddStep(loop, F, 2);
+AddStep(loop, L, 1);
+AddStep(loop, F, 5);
+AddStep(loop, R, 1);
+AddStep(loop, F, 7); //just above the 'mixer'
+AddStep(loop, R, 1);
+AddStep(loop, F, 1);
+AddStep(loop, L, 1);
+AddStep(loop, F, 1);
+AddStep(loop, N, 5);
+
+let loopEnd1 = []; //first loop - the cash in steps to not wait for the mixer
+AddStep(loopEnd1, R, 1);
+AddStep(loopEnd1, F, 4);
+
+let loopEnd2 = []; //cash in
+AddStep(loopEnd2, F, 1);
+AddStep(loopEnd2, L, 1);
+AddStep(loopEnd2, F, 3);
+AddStep(loopEnd2, L, 1);
+AddStep(loopEnd2, F, 5);
+AddStep(loopEnd2, L, 1);
+AddStep(loopEnd2, F, 7);
+AddStep(loopEnd2, R, 1);
+AddStep(loopEnd2, F, 2);
+AddStep(loopEnd2, R, 2);
+AddStep(loopEnd2, F, 6);
+AddStep(loopEnd2, R, 1);
+
+/// execute init
+Exec(getInPos);
+
+/// execute loop
+Exec(loop);
+Exec(loopEnd1);
+while (true) {
+	Exec(loop);
+	Exec(loopEnd2);
+}
