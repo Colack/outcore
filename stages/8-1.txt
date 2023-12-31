@@ -1,0 +1,98 @@
+/// internal funcs
+function AddStep(tgtArr, f, n) {
+	tgtArr.push({ f: f, n: n });
+}
+
+function Exec(queue) {
+	for (let m = 0; m < queue.length; m++) {
+		let command = queue[m];
+		for (let i = 0; i < command.n; i++) {
+			command.f();
+		}
+	}
+}
+
+/// compound commands
+function ThrowAll() {
+	let items = GetWorkerInventoryItems();
+	for (let i = 0; i < items.length; i++) {
+		ThrowItem(0);
+	}
+}
+
+function WaitSync() {
+	while (!SyncWorkers()) { }
+}
+
+/// wrappers/shortcuts
+function F() { MoveForward(); }
+function R() { TurnRight(); }
+function L() { TurnLeft(); }
+function N() { DoNothing(); }
+function T() { ThrowItem(0); }
+function TA() { ThrowAll(); }
+function W() { WaitSync(); }
+
+/// defining queues
+let init = [];
+AddStep(init, F, 1);
+AddStep(init, R, 1);
+AddStep(init, F, 5); //UR button
+
+let loop = []; //loop without mixer output
+AddStep(loop, F, 2);
+AddStep(loop, L, 1);
+AddStep(loop, F, 4); //exchange corner
+AddStep(loop, W, 1);
+AddStep(loop, W, 1);
+AddStep(loop, TA, 1); //throw plat chip, if any
+AddStep(loop, W, 1);
+AddStep(loop, W, 1); //take red chips
+AddStep(loop, L, 1);
+AddStep(loop, F, 2);
+AddStep(loop, L, 1);
+AddStep(loop, F, 2); //plat mixer intake
+AddStep(loop, N, 3);
+AddStep(loop, F, 2); //back to button
+AddStep(loop, L, 1);
+
+let loop2 = []; //loop with mixer output visit
+AddStep(loop2, F, 2);
+AddStep(loop2, L, 1);
+AddStep(loop2, F, 4); //exchange corner
+AddStep(loop2, W, 1);
+AddStep(loop2, W, 1);
+AddStep(loop2, TA, 1); //throw plat chip, if any
+AddStep(loop2, W, 1);
+AddStep(loop2, W, 1); //take red chips
+AddStep(loop2, L, 1);
+AddStep(loop2, F, 2);
+AddStep(loop2, L, 1);
+AddStep(loop2, F, 2); //plat mixer intake
+AddStep(loop2, N, 3);
+AddStep(loop2, F, 1);
+AddStep(loop2, R, 1);
+AddStep(loop2, F, 3);
+AddStep(loop2, R, 1);
+AddStep(loop2, F, 1); //plat output
+AddStep(loop2, N, 7);
+AddStep(loop2, F, 1);
+AddStep(loop2, R, 1);
+AddStep(loop2, F, 3);
+AddStep(loop2, R, 1);
+AddStep(loop2, F, 1);
+AddStep(loop2, N, 1);
+AddStep(loop2, F, 2);
+AddStep(loop2, L, 1);
+
+/// execute one-off
+Exec(init);
+
+/// execute in loop
+while (true) {
+	Exec(loop); //2 chips in mixer
+	Exec(loop); //4
+	Exec(loop2); //1
+	Exec(loop); //3
+	Exec(loop2); //0
+}
