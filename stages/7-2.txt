@@ -1,0 +1,79 @@
+/// internal funcs
+function AddStep(tgtArr, f, n) {
+	tgtArr.push({ f: f, n: n });
+}
+
+function Exec(queue) {
+	for (let m = 0; m < queue.length; m++) {
+		let command = queue[m];
+		for (let i = 0; i < command.n; i++) {
+			command.f();
+		}
+	}
+}
+
+/// compound commands
+function ThrowAll() {
+	let items = GetWorkerInventoryItems();
+	for (let i = 0; i < items.length; i++) {
+		ThrowItem(0);
+	}
+}
+
+function WaitSync() {
+	while (!SyncWorkers()) { }
+}
+
+/// wrappers
+function F() { MoveForward(); }
+function R() { TurnRight(); }
+function L() { TurnLeft(); }
+function N() { DoNothing(); }
+function T() { ThrowItem(0); }
+function TA() { ThrowAll(); }
+function W() { WaitSync(); }
+
+/// defining queues
+let initToEntrance = [];
+AddStep(initToEntrance, R, 1);
+AddStep(initToEntrance, F, 2);
+AddStep(initToEntrance, N, 5); //before entrance
+
+let Exchange = [];
+AddStep(Exchange, W, 1);
+AddStep(Exchange, TA, 1);
+AddStep(Exchange, W, 1);
+
+let entranceToExchange = [];
+AddStep(entranceToExchange, F, 2);
+AddStep(entranceToExchange, L, 1);
+AddStep(entranceToExchange, F, 2);
+AddStep(entranceToExchange, R, 1);
+AddStep(entranceToExchange, F, 3);
+AddStep(entranceToExchange, R, 1);
+AddStep(entranceToExchange, F, 6);
+AddStep(entranceToExchange, R, 1);
+AddStep(entranceToExchange, F, 2);
+AddStep(entranceToExchange, L, 1);
+AddStep(entranceToExchange, F, 1); //exchange point
+
+let ExchangeToEntrance = [];
+AddStep(ExchangeToEntrance, R, 1);
+AddStep(ExchangeToEntrance, F, 7);
+AddStep(ExchangeToEntrance, R, 1);
+AddStep(ExchangeToEntrance, F, 5); //receiver
+AddStep(ExchangeToEntrance, R, 1);
+AddStep(ExchangeToEntrance, F, 4); //entrance
+
+
+/// execute init
+Exec(initToEntrance);
+Exec(entranceToExchange);
+Exec(Exchange);
+
+/// execute loop
+while (true) {
+	Exec(ExchangeToEntrance);
+	Exec(entranceToExchange);
+	Exec(Exchange);
+}
