@@ -1,0 +1,72 @@
+/// internal funcs
+function AddStep(tgtArr, f, n) {
+	tgtArr.push({ f: f, n: n });
+}
+
+function Exec(queue) {
+	for (let m = 0; m < queue.length; m++) {
+		let command = queue[m];
+		for (let i = 0; i < command.n; i++) {
+			command.f();
+		}
+	}
+}
+
+/// wrappers
+function F() { MoveForward(); }
+function R() { TurnRight(); }
+function L() { TurnLeft(); }
+function N() { DoNothing(); }
+function N2() {
+	// to avoid purchasing DoNothing, we just turn twice in place - it does take 2 turns instead though
+	R();
+	L();
+}
+
+/// adding commands to queue - getting into position
+let init = [];
+AddStep(init, R, 2);
+AddStep(init, F, 2);
+
+/// adding commands to loop - main loop for gathering and delivering
+let loop = [];
+
+/// version without "+1 capacity" upgrade
+AddStep(loop, F, 8);
+AddStep(loop, R, 1);
+AddStep(loop, F, 2);
+AddStep(loop, R, 2);
+AddStep(loop, F, 5);
+AddStep(loop, L, 1);
+AddStep(loop, F, 8);
+AddStep(loop, L, 1);
+//AddStep(loop, N, 4); //requires DoNothing() purchased
+AddStep(loop, N2, 2);
+AddStep(loop, F, 2);
+AddStep(loop, R, 2);
+AddStep(loop, F, 2);
+AddStep(loop, R, 2);
+AddStep(loop, F, 3);
+AddStep(loop, L, 1);
+
+/// version simplified for "+1 capacity" upgrade
+/* AddStep(loop, F, 8);
+AddStep(loop, R, 1);
+AddStep(loop, F, 2);
+AddStep(loop, R, 2);
+AddStep(loop, F, 5);
+AddStep(loop, L, 1);
+AddStep(loop, F, 8);
+AddStep(loop, L, 1);
+//AddStep(loop, N, 5); //requires DoNothing() purchased
+AddStep(loop, N2, 3);
+AddStep(loop, F, 3);
+AddStep(loop, L, 1); */
+
+/// execute queue
+Exec(init);
+
+/// execute loop
+while (true) {
+	Exec(loop);
+}
