@@ -1,0 +1,51 @@
+/// internal funcs
+function AddStep(tgtArr, f, n) {
+	tgtArr.push({ f: f, n: n });
+}
+
+function Exec(queue) {
+	for (let m = 0; m < queue.length; m++) {
+		let command = queue[m];
+		for (let i = 0; i < command.n; i++) {
+			command.f();
+		}
+	}
+}
+
+/// wrappers
+function F() { MoveForward(); }
+function R() { TurnRight(); }
+function L() { TurnLeft(); }
+function N() { DoNothing(); }
+
+/// defining queues
+let getInPos = [];
+AddStep(getInPos, F, 2);
+AddStep(getInPos, R, 1);
+AddStep(getInPos, F, 3);
+AddStep(getInPos, L, 1); //before the right part path
+AddStep(getInPos, N, 3);
+
+let loop = [];
+AddStep(loop, F, 3);
+AddStep(loop, L, 1);
+AddStep(loop, F, 5);
+AddStep(loop, L, 1);
+AddStep(loop, F, 6);
+AddStep(loop, L, 1);
+AddStep(loop, F, 8);
+AddStep(loop, L, 1);
+AddStep(loop, F, 1);
+AddStep(loop, N, 4); //cash in
+AddStep(loop, F, 2);
+AddStep(loop, L, 1);
+AddStep(loop, F, 3);
+AddStep(loop, R, 1);
+
+/// execute init
+Exec(getInPos);
+
+/// execute loop
+while (true) {
+	Exec(loop);
+}
