@@ -1,0 +1,25 @@
+/// internal funcs
+let commands = [];
+function AddStep(f, n) {
+	commands.push({ f: f, n: n });
+}
+
+/// adding commands to queue
+AddStep(TurnRight, 3);
+AddStep(MoveForward, 2);
+AddStep(TurnRight, 3);
+AddStep(MoveForward, 4);
+AddStep(TurnRight, 3);
+AddStep(MoveForward, 4);
+AddStep(TurnRight, 1);
+AddStep(MoveForward, 2);
+AddStep(TurnRight, 1);
+AddStep(MoveForward, 9);
+
+/// execute queue
+for (let m = 0; m < commands.length; m++) {
+	let command = commands[m];
+	for (let i = 0; i < command.n; i++) {
+		command.f();
+	}
+}
